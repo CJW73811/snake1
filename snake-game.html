@@ -184,54 +184,6 @@
             position: relative;
             overflow: hidden;
         }
-        /* 二维码弹窗 */
-        #qrcodeModal .modal-content {
-            text-align: center;
-        }
-        #qrcodeContainer {
-            margin: 20px auto;
-            width: 250px;
-            height: 250px;
-            position: relative;
-        }
-        .qrcode-tip {
-            color: #666;
-            font-size: 14px;
-            margin-top: 10px;
-        }
-        /* 新手引导 */
-        .guide-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0,0,0,0.6);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 50;
-            border-radius: 5px;
-        }
-        .guide-content {
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            text-align: center;
-            max-width: 80%;
-        }
-        .guide-content p {
-            margin-bottom: 15px;
-            font-size: 16px;
-        }
-        /* 碰撞预警 */
-        .warning-box {
-            position: absolute;
-            border: 2px solid #F44336;
-            border-radius: 4px;
-            display: none;
-            z-index: 10;
-        }
         /* 分享海报弹窗 */
         #shareModal .modal-content {
             text-align: center;
@@ -295,8 +247,6 @@
             }
         }
     </style>
-    <!-- 引入二维码生成库 -->
-    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
     <!-- 引入海报生成库 -->
     <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 </head>
@@ -331,9 +281,6 @@
         <div class="func-buttons">
             <button class="btn" id="skinBtn">
                 <span>皮肤商店</span>
-            </button>
-            <button class="btn" id="qrcodeBtn">
-                <span>微信扫码玩</span>
             </button>
             <button class="btn" id="pauseBtn">
                 <span>暂停</span>
@@ -382,18 +329,6 @@
                 </div>
             </div>
             <button class="btn" id="applySkinBtn" style="width: 100%;">应用当前皮肤</button>
-        </div>
-    </div>
-
-    <!-- 二维码弹窗 -->
-    <div class="modal" id="qrcodeModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>微信扫码游玩</h2>
-                <button class="close-btn" id="closeQrcodeBtn">&times;</button>
-            </div>
-            <div id="qrcodeContainer"></div>
-            <p class="qrcode-tip">长按二维码保存图片，微信扫码打开即可游玩</p>
         </div>
     </div>
 
@@ -490,9 +425,6 @@
 
             // 初始化皮肤预览
             initSkinPreviews();
-
-            // 生成二维码
-            generateQrcode();
 
             // 绑定事件监听
             bindEvents();
@@ -1135,65 +1067,6 @@
             });
         }
 
-        // 生成二维码
-        function generateQrcode() {
-            const qrcodeContainer = document.getElementById('qrcodeContainer');
-            const url = 'https://cjw73811.github.io/snake/';
-            
-            QRCode.toCanvas(qrcodeContainer, url, {
-                width: 250,
-                margin: 1,
-                color: {
-                    dark: '#333',
-                    light: '#fff'
-                }
-            }, (error) => {
-                if (error) console.error(error);
-                else {
-                    // 添加二维码中心LOGO
-                    const logo = document.createElement('div');
-                    logo.style.position = 'absolute';
-                    logo.style.top = '50%';
-                    logo.style.left = '50%';
-                    logo.style.transform = 'translate(-50%, -50%)';
-                    logo.style.width = '38px';
-                    logo.style.height = '38px';
-                    logo.style.backgroundColor = '#4CAF50';
-                    logo.style.borderRadius = '50%';
-                    logo.style.display = 'flex';
-                    logo.style.justifyContent = 'center';
-                    logo.style.alignItems = 'center';
-                    logo.style.color = 'white';
-                    logo.style.fontSize = '16px';
-                    logo.style.fontWeight = 'bold';
-                    logo.textContent = '蛇';
-                    qrcodeContainer.appendChild(logo);
-
-                    // 添加环形动画
-                    const ring = document.createElement('div');
-                    ring.style.position = 'absolute';
-                    ring.style.top = '0';
-                    ring.style.left = '0';
-                    ring.style.width = '100%';
-                    ring.style.height = '100%';
-                    ring.style.border = '2px dashed #4CAF50';
-                    ring.style.borderRadius = '50%';
-                    ring.style.animation = 'rotate 10s linear infinite';
-                    qrcodeContainer.appendChild(ring);
-
-                    // 添加动画样式
-                    const style = document.createElement('style');
-                    style.textContent = `
-                        @keyframes rotate {
-                            0% { transform: rotate(0deg); }
-                            100% { transform: rotate(360deg); }
-                        }
-                    `;
-                    document.head.appendChild(style);
-                }
-            });
-        }
-
         // 生成分享海报
         function generateSharePoster() {
             const posterCanvas = document.getElementById('posterCanvas');
@@ -1237,26 +1110,11 @@
             posterCtx.fillText(`我的分数：${game.score}`, 30, gameScreenshotY + gameScreenshotHeight + 30);
             posterCtx.fillText(`使用皮肤：${skin.name}`, 30, gameScreenshotY + gameScreenshotHeight + 60);
 
-            // 绘制二维码（简化版）
-            const qrcodeX = posterCanvas.width - 100;
-            const qrcodeY = gameScreenshotY + gameScreenshotHeight + 10;
-            posterCtx.fillStyle = '#fff';
-            posterCtx.fillRect(qrcodeX, qrcodeY, 80, 80);
-            // 绘制简化二维码图案
-            posterCtx.fillStyle = '#333';
-            for (let i = 0; i < 5; i++) {
-                for (let j = 0; j < 5; j++) {
-                    if ((i === 0 || i === 4 || j === 0 || j === 4) || (i === 2 && j === 2)) {
-                        posterCtx.fillRect(qrcodeX + i*16, qrcodeY + j*16, 12, 12);
-                    }
-                }
-            }
-
             // 绘制扫码提示
             posterCtx.fillStyle = '#666';
             posterCtx.font = '12px Arial';
             posterCtx.textAlign = 'center';
-            posterCtx.fillText('扫码挑战我的高分', posterCanvas.width / 2, posterCanvas.height - 20);
+            posterCtx.fillText('长按图片保存，分享游戏成绩', posterCanvas.width / 2, posterCanvas.height - 20);
         }
 
         // 显示新手引导
@@ -1373,18 +1231,6 @@
                 game.isPaused = false;
                 saveStorageData();
                 drawGame();
-            });
-
-            // 二维码按钮
-            document.getElementById('qrcodeBtn').addEventListener('click', () => {
-                document.getElementById('qrcodeModal').style.display = 'flex';
-                game.isPaused = true;
-            });
-
-            // 关闭二维码
-            document.getElementById('closeQrcodeBtn').addEventListener('click', () => {
-                document.getElementById('qrcodeModal').style.display = 'none';
-                game.isPaused = false;
             });
 
             // 分享按钮
