@@ -282,7 +282,7 @@
         let highScore = localStorage.getItem('snakeHighScore') || 0;
         let isGameOver = false;
         let isPaused = false;
-        let gridSize = 20; // 网格大小
+        let gridSize = 20; // 网格大小（现在是固定的整数）
         let canvasSize;
         let gameStarted = false;
         
@@ -368,18 +368,22 @@
         highScoreElement.textContent = highScore;
         initSkinShop();
         
-        // 设置画布大小
+        // 设置画布大小 - 关键修复：确保 gridSize 是整数
         function setupCanvas() {
             // 确保画布是正方形且适应容器
             const containerWidth = canvas.parentElement.clientWidth;
             canvasSize = Math.min(containerWidth, 500); // 最大500px（手机更适配）
+            
+            // **核心修复：固定理想网格数量为20，确保 gridSize 是整数**
+            const idealGridCount = 20;
+            gridSize = Math.floor(canvasSize / idealGridCount);
+            
+            // **关键：重新计算 canvasSize 以完全适配整数 gridSize**
+            // 这样画布会被完美分割成 20x20 的网格，没有任何像素残留
+            canvasSize = gridSize * idealGridCount;
             canvas.width = canvasSize;
             canvas.height = canvasSize;
-            
-            // 调整网格大小以确保画布被均匀分割
-            const maxGridCount = Math.floor(canvasSize / 18); // 手机端网格更密
-            gridSize = canvasSize / maxGridCount;
-            
+
             // 应用皮肤背景
             canvas.style.backgroundColor = currentSkin.bg;
             canvas.style.borderColor = currentSkin.body;
@@ -507,6 +511,7 @@
         
         // 生成食物
         function generateFood() {
+            // 计算最大索引（因为网格是整数，所以这里也是整数）
             const maxPos = (canvasSize / gridSize) - 1;
             let newFood;
             
@@ -707,7 +712,7 @@
             // 将新头部添加到蛇
             snake.unshift(head);
             
-            // 检查是否吃到食物
+            // 检查是否吃到食物 - **关键：由于 gridSize 是整数，坐标都是整数，此比较绝对可靠**
             if (head.x === food.x && head.y === food.y) {
                 // 加分
                 score += 10;
